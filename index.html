@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TM112 Definitions Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f1f5f9; --card:#fff; --ink:#0f172a; --ink2:#475569; --muted:#94a3b8; --line:#e2e8f0;
+  --indigo:#4f46e5; --indigo-d:#4338ca; --indigo-l:#eef2ff; --teal:#0d9488; --teal-l:#ccfbf1;
+  --ok:#16a34a; --ok-l:#dcfce7; --warn:#d97706; --warn-l:#fef3c7; --bad:#dc2626; --bad-l:#fee2e2;
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.app{max-width:1240px;margin:0 auto;padding:18px 16px 28px;display:flex;flex-direction:column;gap:14px}
+
+/* top */
+.top{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px}
+.brand{display:flex;align-items:center;gap:12px;flex:1 1 260px}
+.logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--indigo),var(--teal));color:#fff;font-weight:800;display:grid;place-items:center;letter-spacing:.5px}
+.brand h1{font-size:18px;margin:0;line-height:1.2}
+.brand p{margin:2px 0 0;font-size:12.5px;color:var(--ink2)}
+.overall{flex:1 1 220px;min-width:200px}
+.overall-text{font-size:13px;margin-bottom:6px;color:var(--ink2)}
+.overall-text b{color:var(--ink)}
+.muted{color:var(--muted)}
+
+.bar{height:7px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:var(--indigo);border-radius:99px;transition:width .35s ease}
+.bar-fill.ok{background:var(--ok)} .bar-fill.bad{background:var(--bad)} .bar-fill.teal{background:var(--teal)}
+
+/* units */
+.units{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.unit{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;transition:border-color .15s,box-shadow .15s}
+.unit:hover{border-color:#c7d2fe}
+.unit.on{border-color:var(--indigo);box-shadow:0 0 0 3px var(--indigo-l)}
+.unit-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.unit-name{font-weight:700;font-size:14px}
+.unit-count{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.unit-sub{font-size:11.5px;color:var(--ink2);line-height:1.3;min-height:30px}
+
+/* controls */
+.controls{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.tabs{display:inline-flex;background:#e2e8f0;border-radius:11px;padding:3px}
+.tab{border:0;background:transparent;padding:7px 14px;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--ink2)}
+.tab.on{background:var(--card);color:var(--indigo-d);box-shadow:0 1px 2px rgba(15,23,42,.12)}
+.ctrl-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.toggle-btn{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:7px 12px;font-size:13.5px;font-weight:600;color:var(--ink2)}
+.toggle-btn.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.search input{border:1.5px solid var(--line);border-radius:10px;background:var(--card);padding:8px 12px;width:230px;font-size:14px}
+
+/* layout */
+.main{display:grid;grid-template-columns:290px minmax(0,1fr);gap:16px;align-items:start}
+.side{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:8px;position:sticky;top:10px}
+.side-toggle{display:none}
+.term-list{list-style:none;margin:0;padding:0;max-height:calc(100vh - 40px);overflow:auto;display:flex;flex-direction:column;gap:2px}
+.ti{width:100%;display:flex;align-items:center;gap:9px;text-align:left;border:0;background:transparent;border-radius:9px;padding:7px 9px;font-size:13.5px}
+.ti:hover{background:#f8fafc}
+.ti.on{background:var(--indigo-l);color:var(--indigo-d);font-weight:600}
+.ti-n{flex:0 0 26px;color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px;text-align:right}
+.ti.on .ti-n{color:var(--indigo)}
+.ti-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ti-s{flex:0 0 10px;height:10px;border-radius:50%;border:2px solid var(--line)}
+.ti-s.s-mastered{background:var(--ok);border-color:var(--ok)}
+.ti-s.s-progress{background:var(--warn);border-color:var(--warn)}
+.empty-li{padding:12px;color:var(--muted);font-size:13px}
+
+/* card */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+.card-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.eyebrow{font-size:12px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:.06em}
+.term{font-size:26px;margin:4px 0 0;line-height:1.2}
+.head-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.pos{font-size:12px;color:var(--muted)}
+.pill{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;background:#f1f5f9;color:var(--ink2)}
+.pill-ok{background:var(--ok-l);color:#166534} .pill-warn{background:var(--warn-l);color:#92400e}
+
+.stepper{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0 14px}
+.step{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:8px 10px;font-size:13px;font-weight:600;color:var(--ink2);text-align:left}
+.step .dot{flex:0 0 24px;height:24px;border-radius:50%;background:#e2e8f0;color:var(--ink2);display:grid;place-items:center;font-size:12px}
+.step.past .dot{background:var(--teal-l);color:#0f766e}
+.step.on{border-color:var(--indigo);background:var(--indigo-l);color:var(--indigo-d)}
+.step.on .dot{background:var(--indigo);color:#fff}
+
+.step-body{display:flex;flex-direction:column;gap:14px}
+.instr{margin:0;color:var(--ink2);font-size:14px}
+.def{margin:0;font-size:19px;line-height:1.9;letter-spacing:.005em}
+.def.small{font-size:15.5px;line-height:1.75}
+.def-read{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.kw{background:var(--indigo-l);color:var(--indigo-d);font-weight:700;border-radius:7px;padding:2px 7px;border:1px solid #c7d2fe;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.kw-hit{background:var(--ok-l);color:#166534;border-color:#86efac}
+.kw-miss{background:var(--bad-l);color:#991b1b;border-color:#fca5a5}
+.kw-list{border:1px dashed #c7d2fe;border-radius:12px;padding:12px 14px}
+.kw-list-title{font-size:12px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.kw-chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;background:var(--indigo-l);color:var(--indigo-d);border:1px solid #c7d2fe;border-radius:99px;padding:4px 12px 4px 5px;font-size:14px;font-weight:600}
+.chip b{background:var(--indigo);color:#fff;border-radius:50%;width:20px;height:20px;display:grid;place-items:center;font-size:11px}
+.chip-btn{padding:6px 14px;background:#fff}
+.chip-btn:hover:not(:disabled){background:var(--indigo-l)}
+.chip-used{opacity:.35;text-decoration:line-through;cursor:default}
+
+/* step 2 */
+.guide{font-size:19px;line-height:1.8;background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:14px 18px;word-break:break-word}
+.g-rest{color:#cbd5e1}
+.g-done{color:var(--indigo-d);font-weight:500}
+.g-bad{background:var(--bad-l);color:var(--bad);border-bottom:2px solid var(--bad);border-radius:3px}
+.area{width:100%;resize:vertical;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:16.5px;line-height:1.6;background:#fff}
+.area:focus{border-color:var(--indigo)}
+.area-bad{border-color:var(--bad)} .area-ok{border-color:var(--ok);background:#f0fdf4}
+.meter{display:flex;flex-direction:column;gap:6px}
+.meter-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--ink2);gap:10px}
+.toggle{display:inline-flex;gap:6px;align-items:center;font-weight:600;cursor:pointer;user-select:none}
+.toggle input{accent-color:var(--indigo);width:16px;height:16px}
+
+/* step 3 */
+.def-cloze{line-height:2.5}
+.blank{border:0;border-bottom:2.5px solid var(--indigo);background:var(--indigo-l);border-radius:7px 7px 0 0;padding:3px 8px;margin:0 3px;font-size:17px;max-width:100%;text-align:center;font-weight:600;color:var(--indigo-d)}
+.blank::placeholder{color:#a5b4fc;font-weight:500}
+.blank-ok{border-bottom-color:var(--ok);background:var(--ok-l);color:#166534;-webkit-text-fill-color:#166534;opacity:1}
+.blank-bad{border-bottom-color:var(--bad);background:var(--bad-l);color:#991b1b}
+.shake-a{animation:shakeA .4s} .shake-b{animation:shakeB .4s}
+@keyframes shakeA{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes shakeB{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.bank{border:1px dashed #c7d2fe;border-radius:12px;padding:12px 14px}
+.banner{border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600}
+.banner.ok{background:var(--ok-l);color:#166534}
+
+/* step 4 */
+.hidden-card{background:linear-gradient(135deg,var(--indigo-l),#f0fdfa);border:1px solid #c7d2fe;border-radius:12px;padding:16px 18px}
+.hc-unit{font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.06em}
+.hc-term{font-size:22px;font-weight:700;margin-top:4px}
+.compare{display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:14px}
+.score-row{display:flex;gap:10px;flex-wrap:wrap}
+.score{background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:8px 14px;display:flex;flex-direction:column;font-size:12px;color:var(--ink2)}
+.score b{font-size:20px;color:var(--ink)}
+.verdict{justify-content:center;font-weight:700;font-size:14px}
+.v-ok{background:var(--ok-l);border-color:#86efac;color:#166534}
+.v-warn{background:var(--warn-l);border-color:#fcd34d;color:#92400e}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.col{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff}
+.col-title{font-size:12px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.w-ok{color:#166534;background:#f0fdf4;border-radius:4px}
+.w-extra{color:#92400e;background:var(--warn-l);border-radius:4px}
+.w-miss{border-bottom:2px dotted var(--warn);background:#fffbeb}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:11.5px}
+.legend span,.legend mark{padding:1px 6px;font-weight:600}
+.rate{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#f8fafc}
+.rate-title{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;gap:8px;align-items:center}
+
+/* buttons */
+.actions{display:flex;gap:10px;align-items:center;justify-content:flex-end}
+.actions.wrap{flex-wrap:wrap}
+.spacer{flex:1}
+.btn{border:1.5px solid transparent;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:600;background:#fff;transition:transform .05s,background .15s}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.primary{background:var(--indigo);color:#fff}
+.btn.primary:hover{background:var(--indigo-d)}
+.btn.ghost{border-color:var(--line);color:var(--ink2)}
+.btn.ghost:hover:not(:disabled){background:#f8fafc;border-color:#cbd5e1}
+.btn.ok{background:var(--ok);color:#fff} .btn.ok:hover{background:#15803d}
+.btn.warn{background:var(--warn);color:#fff} .btn.warn:hover{background:#b45309}
+.small-btn{padding:7px 12px;font-size:13px}
+.btn.danger{background:var(--bad);color:#fff;border-color:var(--bad)}
+.card-foot{display:flex;justify-content:space-between;gap:10px;margin-top:22px;padding-top:14px;border-top:1px solid var(--line)}
+.card.empty{text-align:center;padding:48px 24px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.page-foot{text-align:center;font-size:12px;color:var(--muted)}
+
+/* responsive */
+@media (max-width:1100px){.units{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:860px){
+  .main{grid-template-columns:1fr}
+  .side{position:static}
+  .side-toggle{display:block;width:100%;border:0;background:transparent;font-weight:700;font-size:14px;padding:10px;text-align:left}
+  .term-list{display:none;max-height:300px}
+  .term-list.open{display:flex}
+  .cols{grid-template-columns:1fr}
+  .card{padding:16px}
+  .term{font-size:22px}
+  .def{font-size:17.5px}
+  .guide{font-size:17px}
+}
+@media (max-width:560px){
+  .units{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px;scroll-snap-type:x proximity}
+  .unit{flex:0 0 190px;scroll-snap-align:start}
+  .stepper{grid-template-columns:repeat(2,1fr)}
+  .search input{width:100%} .search{flex:1 1 100%}
+  .ctrl-right{width:100%}
+  .head-right{flex-direction:row;align-items:center}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+// Keywords (the blanks in Step 3 of the workbook) are wrapped in {{ }}.
+// Removing the markers yields the exact verbatim definition from the workbook.
+const UNITS = [
+  { id: 1, name: "Living in a Digital World", from: 1, to: 18 },
+  { id: 2, name: "Binary Data Representation & Computation", from: 19, to: 31 },
+  { id: 3, name: "Digital Media", from: 32, to: 54 },
+  { id: 4, name: "A World Built of Data", from: 55, to: 71 },
+  { id: 5, name: "Crossing Boundaries (HCI)", from: 72, to: 86 },
+];
+
+const RAW = [
+  // ---------- Unit 1: Living in a Digital World (1-18) ----------
+  [1, "Ubiquitous", "{{Computers}} and {{smart devices}} are {{everywhere}} around us in {{daily life}} (e.g., smartphones, smart vacuum cleaners)."],
+  [2, "Convergence", "{{Merging}} two or more {{separate technologies}} into a {{single device}} (e.g., combining a computer and a mobile phone into a smartphone)."],
+  [3, "Internet", "A {{global network of networks}}; it is the {{physical hardware infrastructure}} that {{connects computers}} together."],
+  [4, "Web (World Wide Web)", "A {{software}} {{system}} built on top of the internet that {{links files}} across computers to {{access and share information}}."],
+  [5, "Information / Network Society", "A society characterized by {{rapid technological changes}} happening alongside major {{social and economic changes}}."],
+  [6, "Knowledge Society", "Refers to the way {{new information systems}} can {{transform human societies}}."],
+  [7, "Netiquette", "{{Guidelines}} for {{acceptable online behavior}} to make us aware of the {{effect our words have on others}} (e.g., avoid CAPITAL LETTERS)."],
+  [8, "Moderator", "A {{forum participant}} responsible for {{keeping order}}, {{enforcing rules}}, and keeping discussions {{friendly and relevant}}."],
+  [9, "Plagiarism", "{{Cheating}} by {{using another person's work}} {{as if it were your own}} {{without acknowledgment}}."],
+  [10, "Firewall", "{{Security software or hardware}} that {{stops unauthorized access}} to a computer {{without blocking authorized access}}."],
+  [11, "Spam", "{{Unsolicited (unwanted)}} emails or text messages sent to a {{large number of people}}, usually for {{advertising or hoaxes}}."],
+  [12, "Hoax", "A {{false message}} designed to {{mislead recipients}} and {{cause panic or unnecessary actions}}."],
+  [13, "Phishing", "A type of {{hoax message}} aimed at {{tricking users}} into {{revealing private information}} like credit card details or PINs."],
+  [14, "Virus", "{{Malicious software}} that {{attaches to another program}} and {{activates when it runs}} to {{harm or delete files}}."],
+  [15, "Worm", "{{Malicious software}} that {{runs silently}} {{in the background}} {{causing damage without the user realizing}}."],
+  [16, "Trojan", "{{Malware}} {{disguised as legitimate software}} (like a screensaver) to {{steal data}} or {{give hackers control}} behind the scenes."],
+  [17, "Ransomware", "{{Malware}} that {{locks the screen}} or {{blocks access to files}} until a {{ransom (money) is paid}}."],
+  [18, "Random Email Generator", "A {{computer program}} that {{creates email addresses}} by {{combining common surnames}} and {{online email account names}}."],
+
+  // ---------- Unit 2: Binary Data Representation & Computation (19-31) ----------
+  [19, "Bit (Binary Digit)", "The {{smallest unit of data}} in a computer, represented by either {{0 or 1}}."],
+  [20, "Byte", "A {{group of 8 bits}}, capable of representing {{values from 0 to 255}}."],
+  [21, "Word Size", "The {{number of bits}} that a computer's {{CPU can handle at one time}} (e.g., 32-bit or 64-bit)."],
+  [22, "MSB (Most Significant Bit)", "The {{leftmost bit}} with the {{highest place value}}; in sign-magnitude, it {{indicates the sign}} (0 = positive, 1 = negative)."],
+  [23, "LSB (Least Significant Bit)", "The {{rightmost bit}} with the {{lowest place value}}."],
+  [24, "Unsigned Integer", "A {{whole number}} that is {{greater than or equal to zero}} ({{no negative sign}})."],
+  [25, "Sign-Magnitude Representation", "A method to represent {{signed numbers}} where the {{MSB represents the sign}} and the {{remaining bits represent the magnitude}} (value)."],
+  [26, "Scientific Notation", "A special form of {{floating-point notation}} with a {{single non-zero digit (1 to 9)}} to the {{left of the decimal point}} (Sign, Mantissa, Exponent)."],
+  [27, "Truth Table", "A table listing {{all possible combinations}} of {{binary inputs}} and their {{corresponding outputs}} for a logic operation."],
+  [28, "Logic Gate", "An {{electronic component}} made of {{transistors}} (acting as {{on/off switches}}) that performs {{basic logic operations}} (NOT, AND, OR)."],
+  [29, "Noise", "{{Random fluctuations}} in {{electrical voltages}} or friction in {{mechanical systems}} that can {{distort}} how a binary symbol is perceived."],
+  [30, "Positional Notation", "A method used to {{convert binary numbers to decimal}} where each digit's value depends on its {{position (column)}} and the {{power of the base}}."],
+  [31, "Boolean / Binary Logic", "A {{symbolic logic system}} developed by {{George Boole}} focusing on the {{manipulation of 1s (TRUE) and 0s (FALSE)}} to reason about truth and falsity."],
+
+  // ---------- Unit 3: Digital Media (32-54) ----------
+  [32, "Analogue Representation", "A {{continuous representation}} that {{directly mirrors}} a {{real-world quantity}} (e.g., mercury thermometer)."],
+  [33, "Digital Representation", "Representing data using {{discrete (countable)}} {{numerical values coded in binary}} (e.g., digital thermometer)."],
+  [34, "Pixel", "The {{smallest tiny unit}} that {{makes up an image}} on a {{digital screen}}."],
+  [35, "Resolution", "The {{amount of detail}} an image holds, determined by the {{number of pixels}} used."],
+  [36, "Bitmap (Raster Graphics)", "An {{image coding scheme}} that assigns a {{binary code to every individual pixel}} to define its {{color and brightness}}."],
+  [37, "Vector Graphics", "An image coding technique that stores {{mathematical descriptions}} of {{geometric shapes}} (lines, circles) {{instead of pixels}}, resulting in {{smaller file sizes}}."],
+  [38, "Video & Frame Rate", "A video is a {{sequence of still images (frames)}} displayed rapidly to create the {{illusion of movement}}; Frame rate is the speed of displaying {{frames per second (fps)}}."],
+  [39, "Sampling", "{{Measuring the amplitude}} of an {{analogue sound wave}} at {{regular time intervals}}."],
+  [40, "Sampling Rate", "The {{number of sound samples}} taken {{per second}}."],
+  [41, "Quantization", "{{Converting each sound sample}} into a {{discrete binary number}} by {{dividing the voltage range}} into {{fixed bands}}."],
+  [42, "Compression", "{{Reducing the number of bits}} in a file to {{save storage space}} and {{speed up transmission}} {{without significantly degrading quality}}."],
+  [43, "Compression Ratio", "The {{ratio}} of the {{uncompressed (original) file size}} to the {{compressed file size}}."],
+  [44, "Lossless Compression", "Compressing data so it can be {{restored completely}} {{without losing any original details}} (e.g., ZIP, Run-length encoding, Dictionary-based coding)."],
+  [45, "Lossy Compression", "{{Permanently discarding}} less important data (based on {{human perception limits}}) to achieve much {{smaller file sizes}} (e.g., JPEG, MP3)."],
+  [46, "Psychoacoustics", "The study of {{how humans perceive and respond to sound}}, used in {{lossy audio compression}} like MP3."],
+  [47, "Discrete Value", "Data or quantities that can be {{counted in whole numbers}} (e.g., number of people), whereas {{continuous data is measured}}."],
+  [48, "Binary Word", "A {{set of a given number of bits}} used together for {{data representation}} inside a computer."],
+  [49, "File Formats", "Agreed-upon, {{standardized ways}} of {{organizing and storing}} the {{binary data}} that represents a file in a computer."],
+  [50, "Cycle / Period", "The {{time}} between {{adjacent peaks or troughs}} in a {{sound waveform}}."],
+  [51, "Frequency", "The {{number of wave cycles}} completed in a {{fixed time}} (usually one second), which {{determines the pitch}} (high or low) of a sound."],
+  [52, "Amplitude", "The {{maximum displacement}} of a sound wave, which {{determines how loud}} the sound is."],
+  [53, "Decompression", "The {{reverse operation of compression}} where {{redundant parts are put back}} into the file to {{restore it to its initial form}}."],
+  [54, "Run-length Encoding", "A {{lossless compression method}} where 'runs' of {{repeated data items}} are replaced by a {{single instance and a count number}} (e.g., 80(1))."],
+
+  // ---------- Unit 4: A World Built of Data (55-71) ----------
+  [55, "Data", "{{Raw values}} (numbers, text, images) that have {{no context or meaning}} on their own."],
+  [56, "Information", "Data that has been {{processed}} and given {{structure/context}} to become {{meaningful to humans}}."],
+  [57, "Database", "A {{collection of related data}} {{organized}} to permit {{efficient access, reading, and updating}} by a computer."],
+  [58, "Flat Database", "A simple database stored in a {{single table}} (like a spreadsheet), often suffering from {{data duplication}} and {{wasted memory}}."],
+  [59, "Relational Database", "A database that splits data across {{multiple linked tables}} (via {{Normalization}}) to {{eliminate duplication}} and {{improve efficiency}}."],
+  [60, "Entity", "An {{item or thing}} about which we {{store information}} ({{tangible}} like a student, {{intangible}} like a sale, or a {{concept}} like a bank account)."],
+  [61, "Attribute", "A {{descriptive piece of information}} ({{field/column}}) {{about an entity}} (e.g., student's name or postcode)."],
+  [62, "Primary Key (Unique Key)", "A {{unique field}} used to {{identify each individual record}} in a table so {{tables can be linked together}}."],
+  [63, "SQL (Structured Query Language)", "The {{standard language}} used to {{query, retrieve, and manage data}} in a database."],
+  [64, "Big Data", "Technologies designed to {{extract useful insights}} from {{massive, complex pools of data}}, defined by the 4 Vs: {{Volume, Velocity, Variety, and Veracity}}."],
+  [65, "Structured Data", "Data organized in a {{predefined format}} with {{clear fields and types}} (e.g., database tables)."],
+  [66, "Unstructured Data", "Data with {{no predefined structure}} (e.g., {{videos, emails, social media posts}}, sensor data)."],
+  [67, "Cluster Computing", "A form of {{distributed computing}} where multiple {{inexpensive computers (nodes)}} connected via a {{high-speed network}} work simultaneously under a {{central Master computer}}."],
+  [68, "Data Science", "A {{multidisciplinary field}} combining {{programming, math/statistics, and domain expertise}} to {{extract meaningful insights}} from data."],
+  [69, "Normalization", "The process of {{reorganizing a flat database}} into {{relational tables}} to {{identify related data}} and {{eliminate duplication}}."],
+  [70, "Joining Table", "A table in a {{relational database}} used specifically to {{store relationships}} {{and links between entities}} (e.g., linking students to their courses)."],
+  [71, "Datafication", "The increasing process of {{turning various aspects}} of our world and {{daily activities}} into {{computer-readable data}} generated at {{massive rates}}."],
+
+  // ---------- Unit 5: Crossing Boundaries (HCI) (72-86) ----------
+  [72, "HCI (Human-Computer Interaction)", "The study of {{how humans interact with computers}} and how to design {{safe, efficient, and enjoyable user interfaces}}."],
+  [73, "UI (User Interface)", "The {{shared boundary}} between the {{user and the computer system}} that {{enables interaction}}."],
+  [74, "GUI (Graphical User Interface)", "{{Visual interface}} using {{icons and windows}}, designed with a {{specific target user}} in mind."],
+  [75, "WUI (Web User Interface)", "{{Browser-based interface}} designed for {{any member of the public}} as a {{potential user}}."],
+  [76, "UCD (User-Centered Design)", "An {{iterative design approach}} (user -> design -> build -> evaluate) that places {{user needs, goals, and preferences}} at the {{center of the design process}}."],
+  [77, "Visibility", "Making it {{clear what a UI element is used for}} (using {{clear labels and icons}})."],
+  [78, "Feedback", "{{Informing the user}} that an {{action has been completed}} ({{visual, audible, or tactile}})."],
+  [79, "Affordance", "Giving {{visual clues}} on {{how to interact}} with an element (e.g., {{underlined links afford clicking}})."],
+  [80, "Simplicity", "Keeping {{tasks and language}} as {{simple and natural}} as possible."],
+  [81, "Tolerance", "{{Preventing errors}} before they happen or {{making recovery easy}} (e.g., {{confirmation pop-ups}} before deleting)."],
+  [82, "Structure", "{{Grouping related commands}} together {{logically}} (e.g., MS Word toolbar)."],
+  [83, "Consistency", "Keeping {{appearance, position, and behavior}} {{uniform across the system}} so it is {{easy to learn}}."],
+  [84, "Usability (ISO 9241)", "The extent to which a product can be used by specified users to achieve goals with {{Effectiveness}} (accuracy/completeness), {{Efficiency}} (time/effort), and {{Satisfaction}} (comfort/acceptability)."],
+  [85, "Accessibility", "Ensuring {{equal access}} to digital products and services for all people {{regardless of physical or cognitive abilities}}."],
+  [86, "Assistive / Adaptive Technology", "{{Specialized hardware or software}} (such as {{screen readers}} or speech-driven browsers) designed to help people with {{impairments}} use computer systems."],
+];
+
+const { useState, useEffect, useMemo, useRef, useCallback } = React;
+const h = React.createElement;
+
+/* ---------- data prep ---------- */
+const unitOf = (n) => UNITS.find((u) => n >= u.from && n <= u.to);
+const TERMS = RAW.map(([n, title, src]) => {
+  const segs = [];
+  const re = /\{\{(.+?)\}\}/g;
+  let last = 0, m;
+  while ((m = re.exec(src))) {
+    if (m.index > last) segs.push({ kw: false, v: src.slice(last, m.index) });
+    segs.push({ kw: true, v: m[1] });
+    last = re.lastIndex;
+  }
+  if (last < src.length) segs.push({ kw: false, v: src.slice(last) });
+  const def = segs.map((s) => s.v).join("");
+  const kws = segs.filter((s) => s.kw).map((s) => s.v);
+  return { n, title, unit: unitOf(n), segs, def, kws };
+});
+const BY_ID = Object.fromEntries(TERMS.map((t) => [t.n, t]));
+
+/* ---------- helpers ---------- */
+const straight = (s) => s.replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
+const norm = (s) => straight(s).toLowerCase().replace(/\s+/g, " ").trim();
+const plainNorm = (s) => " " + straight(s).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() + " ";
+const wordKey = (w) => straight(w).toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+function seededShuffle(arr, seed) {
+  const a = arr.slice();
+  let s = seed * 9301 + 49297;
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 9301 + 49297) % 233280;
+    const j = Math.floor((s / 233280) * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const STORE_KEY = "tm112_progressive_defs_v1";
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    const p = raw ? JSON.parse(raw) : {};
+    return p && typeof p === "object" ? p : {};
+  } catch (e) { return {}; }
+}
+function saveProgress(p) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(p)); } catch (e) { /* storage unavailable */ }
+}
+
+const STEPS = [
+  { n: 1, label: "Read & Link" },
+  { n: 2, label: "Trace" },
+  { n: 3, label: "Fill Blanks" },
+  { n: 4, label: "Write" },
+];
+
+/* ---------- small pieces ---------- */
+function Bar({ value, total, tone }) {
+  const pct = total ? Math.round((value / total) * 100) : 0;
+  return h("div", { className: "bar", role: "progressbar", "aria-valuenow": pct, "aria-valuemin": 0, "aria-valuemax": 100 },
+    h("div", { className: "bar-fill " + (tone || ""), style: { width: pct + "%" } }));
+}
+
+function StatusPill({ status }) {
+  if (status === "mastered") return h("span", { className: "pill pill-ok" }, "✓ Mastered");
+  if (status === "progress") return h("span", { className: "pill pill-warn" }, "In Progress");
+  return h("span", { className: "pill" }, "Not started");
+}
+
+/* ---------- Step 1 ---------- */
+function Step1({ term, onNext }) {
+  return h("div", { className: "step-body" },
+    h("p", { className: "instr" }, "Read the definition and focus on the highlighted keywords. Link each keyword to the idea it carries."),
+    h("p", { className: "def def-read" },
+      term.segs.map((s, i) => s.kw ? h("mark", { key: i, className: "kw" }, s.v) : h("span", { key: i }, s.v))),
+    term.kws.length > 0 && h("div", { className: "kw-list" },
+      h("div", { className: "kw-list-title" }, "Keywords to link (" + term.kws.length + ")"),
+      h("div", { className: "kw-chips" }, term.kws.map((k, i) => h("span", { key: i, className: "chip" }, h("b", null, i + 1), k)))),
+    h("div", { className: "actions" }, h("button", { className: "btn primary", onClick: onNext }, "Next: Trace the text →")));
+}
+
+/* ---------- Step 2 ---------- */
+function Step2({ term, onNext }) {
+  const [val, setVal] = useState("");
+  const g = term.def;
+  const a = straight(val).toLowerCase();
+  const b = straight(g).toLowerCase();
+  let k = 0;
+  while (k < a.length && k < b.length && a[k] === b[k]) k++;
+  const wrong = val.length > k && k < g.length;
+  const done = k === g.length && val.length >= g.length;
+  const pct = Math.round((k / g.length) * 100);
+  return h("div", { className: "step-body" },
+    h("p", { className: "instr" }, "Type the definition while following the faint guide. Correct characters darken as you go; the first mistake is flagged."),
+    h("div", { className: "guide", "aria-label": "Faint guide" },
+      h("span", { className: "g-done" }, g.slice(0, k)),
+      wrong && h("span", { className: "g-bad" }, g[k]),
+      h("span", { className: "g-rest" }, g.slice(wrong ? k + 1 : k))),
+    h("textarea", {
+      className: "area" + (wrong ? " area-bad" : "") + (done ? " area-ok" : ""),
+      rows: 4, value: val, placeholder: "Type here, tracing the guide above…",
+      onChange: (e) => setVal(e.target.value), spellCheck: false, autoCapitalize: "off", autoCorrect: "off",
+      "aria-label": "Shadow typing input",
+    }),
+    h("div", { className: "meter" },
+      h("div", { className: "meter-row" },
+        h("span", null, done ? "✓ Perfect trace" : wrong ? "Mismatch at character " + (k + 1) : "Matched " + k + " / " + g.length + " characters"),
+        h("span", null, pct + "%")),
+      h(Bar, { value: k, total: g.length, tone: done ? "ok" : wrong ? "bad" : "" })),
+    h("div", { className: "actions" },
+      h("button", { className: "btn ghost", onClick: () => setVal("") }, "Clear"),
+      h("button", { className: "btn primary", onClick: onNext }, "Next: Fill the blanks →")));
+}
+
+/* ---------- Step 3 ---------- */
+function Step3({ term, onNext }) {
+  const kws = term.kws;
+  const [vals, setVals] = useState(() => kws.map(() => ""));
+  const [hints, setHints] = useState(() => kws.map(() => 0));
+  const [checked, setChecked] = useState(false);
+  const [shake, setShake] = useState(0);
+  const [bank, setBank] = useState(false);
+  const [active, setActive] = useState(0);
+  const refs = useRef([]);
+  const bankOrder = useMemo(() => seededShuffle(kws.map((k, i) => i), term.n), [term.n]);
+
+  const ok = (i) => norm(vals[i]) === norm(kws[i]);
+  const solved = kws.filter((_, i) => ok(i)).length;
+  const all = solved === kws.length;
+
+  const setVal = (i, v) => { setVals((p) => p.map((x, j) => (j === i ? v : x))); setChecked(false); };
+  const nextUnsolved = (from) => {
+    for (let d = 1; d <= kws.length; d++) {
+      const j = (from + d) % kws.length;
+      if (norm(vals[j]) !== norm(kws[j])) return j;
+    }
+    return from;
+  };
+  const firstUnsolved = () => { const i = kws.findIndex((_, j) => !ok(j)); return i < 0 ? 0 : i; };
+
+  const doCheck = () => {
+    setChecked(true);
+    if (!all) setShake((s) => s + 1);
+  };
+  const doHint = () => {
+    const i = ok(active) ? firstUnsolved() : active;
+    if (ok(i)) return;
+    setHints((p) => p.map((x, j) => (j === i ? Math.min(kws[i].length, x + 1) : x)));
+    setActive(i);
+    const el = refs.current[i]; if (el) el.focus();
+  };
+  const doReveal = () => { setVals(kws.slice()); setChecked(true); };
+  const doReset = () => { setVals(kws.map(() => "")); setHints(kws.map(() => 0)); setChecked(false); setActive(0); };
+  const pick = (i) => {
+    const target = ok(active) ? firstUnsolved() : active;
+    const v = kws[i];
+    setVals((p) => p.map((x, j) => (j === target ? v : x)));
+    setChecked(true);
+    if (norm(v) !== norm(kws[target])) setShake((s) => s + 1);
+    else setActive(nextUnsolved(target));
+  };
+
+  let bi = -1;
+  const body = term.segs.map((s, i) => {
+    if (!s.kw) return h("span", { key: i }, s.v);
+    bi++;
+    const idx = bi;
+    const good = ok(idx);
+    const bad = checked && !good && vals[idx].trim() !== "";
+    const empty = checked && !good && vals[idx].trim() === "";
+    const ph = hints[idx] > 0 ? kws[idx].slice(0, hints[idx]) + "…" : "";
+    return h("input", {
+      key: i, type: "text",
+      ref: (el) => (refs.current[idx] = el),
+      className: "blank" + (good ? " blank-ok" : "") + (bad || empty ? " blank-bad" : "") + ((bad || empty) && shake ? (shake % 2 ? " shake-a" : " shake-b") : ""),
+      style: { width: Math.min(Math.max(kws[idx].length, 6) + 3, 46) + "ch" },
+      value: vals[idx], placeholder: ph, disabled: good,
+      onFocus: () => setActive(idx),
+      onChange: (e) => setVal(idx, e.target.value),
+      onKeyDown: (e) => { if (e.key === "Enter") { e.preventDefault(); doCheck(); } },
+      autoComplete: "off", autoCapitalize: "off", autoCorrect: "off", spellCheck: false,
+      "aria-label": "Blank " + (idx + 1) + " of " + kws.length,
+    });
+  });
+
+  return h("div", { className: "step-body" },
+    h("p", { className: "instr" }, "Cover your memory of Steps 1–2 and fill in the missing keywords. A green border means an exact match."),
+    h("p", { className: "def def-cloze" }, body),
+    h("div", { className: "meter" },
+      h("div", { className: "meter-row" },
+        h("span", null, all ? "✓ All keywords correct" : solved + " / " + kws.length + " blanks correct"),
+        h("label", { className: "toggle" },
+          h("input", { type: "checkbox", checked: bank, onChange: (e) => setBank(e.target.checked) }),
+          h("span", null, "Word bank"))),
+      h(Bar, { value: solved, total: kws.length, tone: all ? "ok" : "" })),
+    bank && h("div", { className: "bank" },
+      h("div", { className: "kw-list-title" }, "Tap a keyword to place it in the highlighted blank"),
+      h("div", { className: "kw-chips" }, bankOrder.map((i) => {
+        const used = ok(i);
+        return h("button", { key: i, className: "chip chip-btn" + (used ? " chip-used" : ""), disabled: used, onClick: () => pick(i) }, kws[i]);
+      }))),
+    all && h("div", { className: "banner ok" }, "Nicely done — every keyword is in place. Ready to write it from memory?"),
+    h("div", { className: "actions wrap" },
+      h("button", { className: "btn ghost", onClick: doHint, disabled: all }, "Hint"),
+      h("button", { className: "btn ghost", onClick: doCheck, disabled: all }, "Check answers"),
+      h("button", { className: "btn ghost", onClick: doReveal, disabled: all }, "Reveal"),
+      h("button", { className: "btn ghost", onClick: doReset }, "Reset"),
+      h("span", { className: "spacer" }),
+      h("button", { className: "btn primary", onClick: onNext }, "Next: Write from memory →")));
+}
+
+/* ---------- Step 4 ---------- */
+function Step4({ term, status, onRate }) {
+  const [val, setVal] = useState("");
+  const [graded, setGraded] = useState(false);
+
+  const result = useMemo(() => {
+    if (!graded) return null;
+    const userPlain = plainNorm(val);
+    const userWords = new Set(val.split(/\s+/).map(wordKey).filter(Boolean));
+    const origWords = term.def.split(/\s+/).map(wordKey).filter(Boolean);
+    const origSet = new Set(origWords);
+    const kwHit = term.kws.map((k) => userPlain.includes(plainNorm(k)));
+    const covered = origWords.filter((w) => userWords.has(w)).length;
+    return { userWords, origSet, kwHit, hits: kwHit.filter(Boolean).length, cover: Math.round((covered / origWords.length) * 100) };
+  }, [graded, val, term]);
+
+  const renderOriginal = () => {
+    let ki = -1;
+    return term.segs.map((s, i) => {
+      if (s.kw) {
+        ki++;
+        const hit = result.kwHit[ki];
+        return h("mark", { key: i, className: "kw " + (hit ? "kw-hit" : "kw-miss"), title: hit ? "You wrote this" : "Missed" }, s.v);
+      }
+      const parts = s.v.split(/(\s+)/);
+      return h("span", { key: i }, parts.map((p, j) => {
+        const k = wordKey(p);
+        if (!k || result.userWords.has(k)) return p;
+        return h("span", { key: j, className: "w-miss" }, p);
+      }));
+    });
+  };
+  const renderUser = () => val.split(/(\s+)/).map((p, j) => {
+    const k = wordKey(p);
+    if (!k) return p;
+    return h("span", { key: j, className: result.origSet.has(k) ? "w-ok" : "w-extra" }, p);
+  });
+
+  const good = result && result.hits === term.kws.length && result.cover >= 85;
+  return h("div", { className: "step-body" },
+    h("p", { className: "instr" }, "The definition is hidden. Write it in full from memory, then compare."),
+    h("div", { className: "hidden-card" },
+      h("div", { className: "hc-unit" }, "Unit " + term.unit.id + " · " + term.unit.name),
+      h("div", { className: "hc-term" }, "#" + term.n + ". " + term.title)),
+    h("textarea", {
+      className: "area", rows: 5, value: val, placeholder: "Write the full definition from memory…",
+      onChange: (e) => { setVal(e.target.value); setGraded(false); }, spellCheck: false, autoCapitalize: "off", autoCorrect: "off",
+      "aria-label": "Write the definition from memory",
+    }),
+    h("div", { className: "actions wrap" },
+      h("button", { className: "btn ghost", onClick: () => { setVal(""); setGraded(false); } }, "Clear"),
+      h("span", { className: "spacer" }),
+      h("button", { className: "btn primary", onClick: () => setGraded(true) }, "Compare & Grade")),
+    result && h("div", { className: "compare" },
+      h("div", { className: "score-row" },
+        h("div", { className: "score" }, h("b", null, result.hits + " / " + term.kws.length), h("span", null, "keywords recalled")),
+        h("div", { className: "score" }, h("b", null, result.cover + "%"), h("span", null, "word coverage")),
+        h("div", { className: "score verdict " + (good ? "v-ok" : "v-warn") }, good ? "Looks mastered" : "Keep practising")),
+      h("div", { className: "cols" },
+        h("div", { className: "col" },
+          h("div", { className: "col-title" }, "Your answer"),
+          h("p", { className: "def small" }, val.trim() ? renderUser() : h("em", { className: "muted" }, "(nothing written)")),
+          h("div", { className: "legend" }, h("span", { className: "w-ok" }, "in the definition"), h("span", { className: "w-extra" }, "not in the definition"))),
+        h("div", { className: "col" },
+          h("div", { className: "col-title" }, "Workbook definition"),
+          h("p", { className: "def small" }, renderOriginal()),
+          h("div", { className: "legend" }, h("mark", { className: "kw kw-hit" }, "keyword recalled"), h("mark", { className: "kw kw-miss" }, "keyword missed"), h("span", { className: "w-miss" }, "other word missed")))),
+      h("div", { className: "rate" },
+        h("div", { className: "rate-title" }, "How did that feel?"),
+        h("div", { className: "actions wrap" },
+          h("button", { className: "btn warn", onClick: () => onRate("progress") }, "Needs Practice"),
+          h("button", { className: "btn ok", onClick: () => onRate("mastered") }, "✓ Mastered")))),
+    !result && h("div", { className: "rate muted-rate" },
+      h("div", { className: "rate-title" }, "Current status: ", h(StatusPill, { status })),
+      h("div", { className: "actions wrap" },
+        h("button", { className: "btn ghost", onClick: () => onRate("progress") }, "Mark Needs Practice"),
+        h("button", { className: "btn ghost", onClick: () => onRate("mastered") }, "Mark Mastered"))));
+}
+
+/* ---------- Card ---------- */
+function Card({ term, status, pos, total, onPrev, onNext, onRate }) {
+  const [step, setStep] = useState(1);
+  const go = (n) => setStep(Math.min(4, Math.max(1, n)));
+  return h("article", { className: "card", "aria-live": "polite" },
+    h("header", { className: "card-head" },
+      h("div", null,
+        h("div", { className: "eyebrow" }, "Unit " + term.unit.id + " · " + term.unit.name),
+        h("h2", { className: "term" }, "#" + term.n + ". " + term.title)),
+      h("div", { className: "head-right" }, h(StatusPill, { status }), h("div", { className: "pos" }, pos + " of " + total))),
+    h("nav", { className: "stepper", "aria-label": "Steps" },
+      STEPS.map((s) => h("button", {
+        key: s.n, className: "step" + (step === s.n ? " on" : "") + (step > s.n ? " past" : ""),
+        onClick: () => go(s.n), "aria-current": step === s.n ? "step" : undefined,
+      }, h("span", { className: "dot" }, s.n), h("span", { className: "lbl" }, s.label)))),
+    step === 1 && h(Step1, { term, onNext: () => go(2) }),
+    step === 2 && h(Step2, { term, onNext: () => go(3) }),
+    step === 3 && h(Step3, { term, onNext: () => go(4) }),
+    step === 4 && h(Step4, { term, status, onRate }),
+    h("footer", { className: "card-foot" },
+      h("button", { className: "btn ghost", onClick: onPrev }, "← Previous term"),
+      h("button", { className: "btn ghost", onClick: onNext }, "Next term →")));
+}
+
+/* ---------- App ---------- */
+function App() {
+  const [prog, setProg] = useState(loadProgress);
+  const [unitSel, setUnitSel] = useState("all");
+  const [filter, setFilter] = useState("all");
+  const [shuffle, setShuffle] = useState(false);
+  const [shuffleSeed, setShuffleSeed] = useState(1);
+  const [query, setQuery] = useState("");
+  const [currentId, setCurrentId] = useState(1);
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [listOpen, setListOpen] = useState(false);
+
+  useEffect(() => { saveProgress(prog); }, [prog]);
+  useEffect(() => {
+    if (!confirmReset) return;
+    const t = setTimeout(() => setConfirmReset(false), 4000);
+    return () => clearTimeout(t);
+  }, [confirmReset]);
+
+  const statusOf = (id) => prog[id] || "new";
+
+  const list = useMemo(() => {
+    let l = TERMS.filter((t) => unitSel === "all" || t.unit.id === unitSel);
+    if (filter === "mastered") l = l.filter((t) => prog[t.n] === "mastered");
+    if (filter === "unmastered") l = l.filter((t) => prog[t.n] !== "mastered");
+    const q = query.trim().toLowerCase().replace(/^#/, "");
+    if (q) l = l.filter((t) => String(t.n) === q || t.title.toLowerCase().includes(q));
+    if (shuffle) {
+      const order = seededShuffle(TERMS.map((t) => t.n), shuffleSeed);
+      const rank = Object.fromEntries(order.map((id, i) => [id, i]));
+      l = l.slice().sort((a, b) => rank[a.n] - rank[b.n]);
+    }
+    return l;
+  }, [unitSel, filter, query, shuffle, shuffleSeed, prog]);
+
+  const current = list.find((t) => t.n === currentId) || list[0] || null;
+  const curIdx = current ? list.indexOf(current) : -1;
+
+  const move = (d) => {
+    if (!list.length) return;
+    const i = (curIdx + d + list.length) % list.length;
+    setCurrentId(list[i].n);
+  };
+  const rate = (status) => {
+    if (!current) return;
+    const nextId = list.length > 1 ? list[(curIdx + 1) % list.length].n : current.n;
+    setProg((p) => ({ ...p, [current.n]: status }));
+    setCurrentId(nextId);
+  };
+  const resetAll = () => {
+    if (!confirmReset) { setConfirmReset(true); return; }
+    setProg({}); setConfirmReset(false);
+  };
+
+  const unitStats = UNITS.map((u) => {
+    const ts = TERMS.filter((t) => t.unit.id === u.id);
+    return { u, total: ts.length, done: ts.filter((t) => prog[t.n] === "mastered").length };
+  });
+  const totalDone = TERMS.filter((t) => prog[t.n] === "mastered").length;
+  const inProg = TERMS.filter((t) => prog[t.n] === "progress").length;
+
+  const unitBtn = (id, title, sub, done, total) => h("button", {
+    key: id, className: "unit" + (unitSel === id ? " on" : ""), onClick: () => setUnitSel(id), "aria-pressed": unitSel === id,
+  },
+    h("div", { className: "unit-top" },
+      h("span", { className: "unit-name" }, title),
+      h("span", { className: "unit-count" }, done + "/" + total)),
+    h("div", { className: "unit-sub" }, sub),
+    h(Bar, { value: done, total, tone: done === total ? "ok" : "" }));
+
+  const FILTERS = [["all", "All Terms"], ["unmastered", "Unmastered"], ["mastered", "Mastered"]];
+
+  return h("div", { className: "app" },
+    h("header", { className: "top" },
+      h("div", { className: "brand" },
+        h("div", { className: "logo" }, "TM"),
+        h("div", null,
+          h("h1", null, "TM112 Definitions Trainer"),
+          h("p", null, "Progressive fading · Units 1–5 · 86 terms"))),
+      h("div", { className: "overall" },
+        h("div", { className: "overall-text" },
+          h("b", null, totalDone + " / 86"), " mastered", inProg > 0 && h("span", { className: "muted" }, " · " + inProg + " in progress")),
+        h(Bar, { value: totalDone, total: 86, tone: "teal" })),
+      h("button", { className: "btn ghost small-btn" + (confirmReset ? " danger" : ""), onClick: resetAll },
+        confirmReset ? "Click again to confirm" : "Reset Progress")),
+
+    h("section", { className: "units", "aria-label": "Units" },
+      unitBtn("all", "All Units", "Terms 1–86", totalDone, 86),
+      unitStats.map(({ u, total, done }) => unitBtn(u.id, "Unit " + u.id, u.name + " · " + total + " terms (" + u.from + "–" + u.to + ")", done, total))),
+
+    h("section", { className: "controls" },
+      h("div", { className: "tabs", role: "tablist" },
+        FILTERS.map(([k, l]) => h("button", { key: k, role: "tab", "aria-selected": filter === k, className: "tab" + (filter === k ? " on" : ""), onClick: () => setFilter(k) }, l))),
+      h("div", { className: "ctrl-right" },
+        h("button", { className: "btn toggle-btn" + (shuffle ? " on" : ""), "aria-pressed": shuffle, onClick: () => { if (shuffle) setShuffle(false); else { setShuffleSeed((s) => s + 1); setShuffle(true); } } }, "⇄ Shuffle Mode"),
+        shuffle && h("button", { className: "btn ghost small-btn", onClick: () => setShuffleSeed((s) => s + 1) }, "Reshuffle"),
+        h("div", { className: "search" },
+          h("input", {
+            type: "search", value: query, placeholder: "Search by number or name…", "aria-label": "Search terms",
+            onChange: (e) => setQuery(e.target.value),
+            onKeyDown: (e) => { if (e.key === "Enter" && list[0]) { setCurrentId(list[0].n); setListOpen(false); } },
+          })))),
+
+    h("main", { className: "main" },
+      h("aside", { className: "side" },
+        h("button", { className: "side-toggle", onClick: () => setListOpen((o) => !o), "aria-expanded": listOpen },
+          "Terms (" + list.length + ") " + (listOpen ? "▲" : "▼")),
+        h("ol", { className: "term-list" + (listOpen ? " open" : "") },
+          list.length === 0 && h("li", { className: "empty-li" }, "No terms match."),
+          list.map((t) => {
+            const st = statusOf(t.n);
+            return h("li", { key: t.n },
+              h("button", { className: "ti" + (current && current.n === t.n ? " on" : ""), onClick: () => { setCurrentId(t.n); setListOpen(false); } },
+                h("span", { className: "ti-n" }, t.n),
+                h("span", { className: "ti-t" }, t.title),
+                h("span", { className: "ti-s s-" + st, title: st === "mastered" ? "Mastered" : st === "progress" ? "In progress" : "Not started" })));
+          }))),
+      h("div", { className: "stage" },
+        current
+          ? h(Card, { key: current.n, term: current, status: statusOf(current.n), pos: curIdx + 1, total: list.length, onPrev: () => move(-1), onNext: () => move(1), onRate: rate })
+          : h("div", { className: "card empty" },
+              h("h2", null, "Nothing to show"),
+              h("p", null, filter === "mastered" ? "You haven't mastered any terms in this selection yet." : filter === "unmastered" ? "Every term in this selection is mastered. Great work!" : "No terms match your search."),
+              h("button", { className: "btn primary", onClick: () => { setFilter("all"); setQuery(""); } }, "Show all terms")))),
+    h("footer", { className: "page-foot" }, "Progress is saved in this browser. Definitions are taken verbatim from the TM112 Progressive Fading Definitions Workbook."));
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+
+</script>
+</body>
+</html>
